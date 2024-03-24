@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: UltimateGG <clubblock1@gmail.com>
+Date: Sat, 23 Mar 2024 23:15:21 -0500
+Subject: [PATCH] Add config option for allowing falling block dupe exploit
+
+
+diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+index ffbab76e55807f04ebb25242eadbea114004b1b3..a2a6b470449abb122d7355aed7b5c13c9fe2d7bc 100644
+--- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+@@ -119,6 +119,8 @@ public class GlobalConfiguration extends ConfigurationPart {
+     public UnsupportedSettings unsupportedSettings;
+ 
+     public class UnsupportedSettings extends ConfigurationPart {
++        @Comment("This setting allows for exploits related to end portals, for example sand duping")
++        public boolean allowUnsafeEndPortalTeleportation = false;
+         @Comment("This setting controls if players should be able to break bedrock, end portals and other intended to be permanent blocks.")
+         public boolean allowPermanentBlockBreakExploits = false;
+         @Comment("This setting controls if player should be able to use TNT duplication, but this also allows duplicating carpet, rails and potentially other items")
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index b38c4cbcf0405d82c7b6e018e80a3174e460c1a4..e8680337dafb7392ccea0951460c10885199ce74 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -3066,7 +3066,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+             }
+ 
+             this.processPortalCooldown();
+-            this.tickEndPortal(); // Paper - make end portalling safe
++            if (!io.papermc.paper.configuration.GlobalConfiguration.get().unsupportedSettings.allowUnsafeEndPortalTeleportation) this.tickEndPortal(); // Paper - make end portalling safe
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
+index eff81e846f696349b3bd3d26c02442f157b169f0..36303a0b4914b731b51460cbb93fe9507a39bc5b 100644
+--- a/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/FallingBlockEntity.java
+@@ -130,11 +130,6 @@ public class FallingBlockEntity extends Entity {
+ 
+     @Override
+     public void tick() {
+-        // Paper start - fix sand duping
+-        if (this.isRemoved()) {
+-            return;
+-        }
+-        // Paper end - fix sand duping
+         if (this.blockState.isAir()) {
+             this.discard();
+         } else {
+@@ -147,12 +142,6 @@ public class FallingBlockEntity extends Entity {
+ 
+             this.move(MoverType.SELF, this.getDeltaMovement());
+ 
+-            // Paper start - fix sand duping
+-            if (this.isRemoved()) {
+-                return;
+-            }
+-            // Paper end - fix sand duping
+-
+             // Paper start - Configurable EntityFallingBlock height nerf
+             if (this.level().paperConfig().fixes.fallingBlockHeightNerf.test(v -> this.getY() > v)) {
+                 if (this.dropItem && this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
