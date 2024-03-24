@@ -4,6 +4,9 @@ Paper [![Paper Build Status](https://img.shields.io/github/actions/workflow/stat
 [![Open Collective](https://img.shields.io/opencollective/all/papermc?label=OpenCollective%20Sponsors)](https://opencollective.com/papermc)
 ===========
 
+### This fork adds the config setting for the vanilla portal falling block duplication glitch but for Paper 1.20
+
+
 High-performance Spigot fork that aims to fix gameplay and mechanics inconsistencies.
 
 
