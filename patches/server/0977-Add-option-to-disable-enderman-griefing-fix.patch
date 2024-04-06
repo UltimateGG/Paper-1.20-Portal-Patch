@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: UltimateGG <clubblock1@gmail.com>
+Date: Fri, 5 Apr 2024 20:03:37 -0500
+Subject: [PATCH] Add option to disable enderman griefing (fix)
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/monster/EnderMan.java b/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
+index 2c02defe83a13b7ad31ba697f2a51f33f128ed72..37bfaf7e770b3de5830f5df7af6c5e6247c3dfc1 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
++++ b/src/main/java/net/minecraft/world/entity/monster/EnderMan.java
+@@ -505,7 +505,7 @@ public class EnderMan extends Monster implements NeutralMob {
+ 
+         @Override
+         public boolean canUse() {
+-            if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.disableEndermanGriefing) return false; // Paper - Disable Enderman griefing
++            if (io.papermc.paper.configuration.GlobalConfiguration.get().misc.disableEndermanGriefing) return false; // Paper - Disable Enderman griefing
+             return this.enderman.getCarriedBlock() == null ? false : (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.enderman.getRandom().nextInt(reducedTickDelay(2000)) == 0);
+         }
+ 
+@@ -553,7 +553,7 @@ public class EnderMan extends Monster implements NeutralMob {
+ 
+         @Override
+         public boolean canUse() {
+-            if (!io.papermc.paper.configuration.GlobalConfiguration.get().misc.disableEndermanGriefing) return false; // Paper - Disable Enderman griefing
++            if (io.papermc.paper.configuration.GlobalConfiguration.get().misc.disableEndermanGriefing) return false; // Paper - Disable Enderman griefing
+             return this.enderman.getCarriedBlock() != null ? false : (!this.enderman.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) ? false : this.enderman.getRandom().nextInt(reducedTickDelay(20)) == 0);
+         }
+ 
